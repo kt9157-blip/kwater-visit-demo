@@ -22,6 +22,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import IntegrityError
 
 load_dotenv()
 
@@ -266,9 +267,15 @@ def init_db() -> None:
     """)
 
     # 기본 관리자 계정 생성
+    # Streamlit Cloud에서는 앱 초기화가 동시에 실행될 수 있어
+    # 중복 INSERT로 IntegrityError가 발생할 수 있습니다.
+    # 따라서 먼저 조회하고, 그래도 중복 충돌이 발생하면 안전하게 무시합니다.
     for username, password, name, dept in DEFAULT_ADMINS:
         existing = fetch_one("SELECT id FROM users WHERE username=:username", {"username": username})
-        if not existing:
+        if existing:
+            continue
+
+        try:
             execute("""
             INSERT INTO users
             (username, password_hash, name, department, role, status, requested_reason, created_at, approved_at, approved_by)
@@ -281,6 +288,10 @@ def init_db() -> None:
                 "department": dept,
                 "created_at": now_str(),
             })
+        except IntegrityError:
+            # 다른 세션이 동시에 같은 관리자 계정을 먼저 만든 경우입니다.
+            # 이미 생성된 계정으로 보면 되므로 앱 실행을 중단하지 않습니다.
+            pass
 
 
 def add_event(event_type: str, title: str, body: str = "", target_role: str = "admin") -> None:
