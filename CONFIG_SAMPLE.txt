@@ -1,0 +1,16 @@
+# Streamlit Community Cloud 무료 시연용 설정 안내
+# 이 파일은 업로드해도 되지만, 실제로 앱이 읽지는 않습니다.
+# 무료 시연은 app.py와 requirements.txt만 있어도 실행됩니다.
+
+초기 관리자 계정:
+admin01 / kwater1234 / 비상계획처
+admin02 / kwater1234 / 정보보안처
+admin03 / kwater1234 / 시설관리부
+
+모니터링 코드:
+monitor1234
+
+주의:
+- 실제 개인정보 입력 금지
+- 실제 운영 비밀번호 사용 금지
+- 무료 시연용 테스트 데이터만 입력
